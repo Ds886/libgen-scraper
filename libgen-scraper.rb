@@ -1,18 +1,13 @@
 require 'mechanize'
 mechanize = Mechanize.new
 mechanize.history_added = Proc.new { sleep 3 }
-mechanize.follow_meta_refresh = true 
+mechanize.follow_meta_refresh = true
 mechanize.verify_mode = OpenSSL::SSL::VERIFY_NONE
-mechanize.pluggable_parser.default = Mechanize::Download 
+mechanize.pluggable_parser.default = Mechanize::Download
 
-unless Dir.exist? "pdf"
-    Dir.mkdir("pdf")
-    puts "Created folder 'pdf' to download books into."
-end 
-Dir.chdir("pdf")
 
 if ARGV[0] == "testing"
-  input = "beer mechanics" 
+  input = "beer mechanics"
   ARGV[0].clear
 else
   puts "Search for a book : "
@@ -26,7 +21,7 @@ count = page.search(".c tr").count
 puts "\n FINDING TOP RESULTS (25 OPTIONS AT MAX) \n"
 
 for i in (1..count-1)
-  auth , book = page.search(".c tr")[i].search("td")[1].text , page.search(".c tr")[i].search("td")[2].children.last.text  
+  auth , book = page.search(".c tr")[i].search("td")[1].text , page.search(".c tr")[i].search("td")[2].children.last.text
   puts "(#{i}) #{book} - #{auth} "
   hash = page.search(".c tr")[i].search("td")[2].children.last["href"].split("md5=")[1]
   hash_list.push([hash,auth,book])
@@ -39,7 +34,7 @@ while !(select >= 1 && select <= i)
     filename = hash_list[select-1][2] + " " + hash_list[select-1][1]
     filename = filename.gsub(" ","_")
     puts "Starting download of #{filename}.pdf"
-    mechanize.get("http://libgen.io/get/#{hash_list[select-1][0]}/#{filename}.pdf").save
+    mechanize.get("http://booksdl.org/get.php?md5=#{hash_list[select-1][0]}").save
     puts "Finished download of #{filename}.pdf"
   else
     puts "Invalid choice."
